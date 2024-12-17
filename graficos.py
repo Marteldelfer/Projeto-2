@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import networkx as nx
 import math
 
 eixoX = [i for i in range(1, 200)]
@@ -23,4 +24,13 @@ plt.plot(eixoX, nSqr, label='n ** 2')
 plt.plot(eixoX, twoN, label='2 ** n')
 plt.plot(eixoX, nFat, label='fat(n)')
 plt.legend()
+plt.show()
+
+v = "ABCDEF"
+arestas = [v[i] + v[j] for i in range(len(v)) for j in range(i, len(v)) if i != j and (j + i) % 3 != 0]
+print(arestas)
+
+G = nx.Graph()
+G.add_edges_from(arestas)
+nx.draw_networkx(G)
 plt.show()
