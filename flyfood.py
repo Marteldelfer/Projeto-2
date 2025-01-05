@@ -26,7 +26,6 @@ def abrir_mapa(mapa_arquivo:str): # retorna um dicionário com as coordenadas de
             if i != '0':
                 matriz_mapa[i] = (y,x)
             x += 1
-    print(matriz_mapa) # remover essa linha no código final
     return matriz_mapa
 
 
@@ -76,7 +75,7 @@ def forca_bruta(matriz):
                 caminho_menor = caminho
                 tamanho_menor = tamanho
 
-    return caminho_menor, tamanho_menor # no código final, retorne apenas o caminho.
+    return caminho_menor, tamanho_menor # Adicionando à solução, retornamos a distância percorrida
 
 
 
