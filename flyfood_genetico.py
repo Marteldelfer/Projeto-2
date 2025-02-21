@@ -1,4 +1,4 @@
-import csv, math, random, matplotlib.pyplot as plt
+import csv, math, random, matplotlib.pyplot as plt, numpy as np
 from typing import List, Tuple, Dict, Iterable
 
 Grafo = Dict[int, Dict[int, float]]
@@ -72,5 +72,65 @@ def selecionar_pais(grafo : Grafo, candidatos : List[List[int]], teste = "aptida
             pais.append(candidatoA if distancia_caminho(grafo, candidatoA) < distancia_caminho(grafo, candidatoB) else candidatoB)
         return pais
 
-def gerar_filhos() -> List[List[int]]:
-    pass
+def trocar_gene(caminho : List[int], indicie : int, gene : int) -> None:
+    for i in range(len(caminho)):
+        if caminho[i] == gene:
+            indicie_trocar = i
+            break
+    caminho[indicie], caminho[indicie_trocar] = caminho[indicie_trocar], caminho[indicie]
+
+def crossover(a : List[int], b : List[int]) -> Tuple[List[int], List[int]]:
+    indicie_troca = random.randrange(0, len(a))
+    res_a, res_b = a[:], b[:]
+    for i in range(indicie_troca):
+        trocar_gene(res_a, i, b[i])
+        trocar_gene(res_b, i, a[i])
+    return res_a, res_b
+
+def mutacao(caminho : List[int], p : float = 0.1) -> None:
+    if p >= random.random():
+        i_gene_a, i_gene_b = random.randrange(len(caminho)), random.randrange(len(caminho))
+        caminho[i_gene_a], caminho[i_gene_b] = caminho[i_gene_b], caminho[i_gene_a]
+
+def gerar_filhos(pais : List[List[int]], p_mutacao : float = 0.1, p_filho : float = 0.95) -> List[List[int]]:
+    filhos = []
+    while pais:
+        pai_a = pais.pop(random.randrange(0, len(pais)))
+        pai_b = pais.pop(random.randrange(0, len(pais)))
+        if p_filho >= random.random():
+            filhos.extend(crossover(pai_a, pai_b))
+            filhos.extend(crossover(pai_a, pai_b))
+        else:
+            filhos.extend((pai_a,pai_b,pai_a,pai_b))
+    for filho in filhos:
+        mutacao(filho, p_mutacao)
+    return filhos
+
+def genetico():
+    grafo = gerar_grafo()
+    pais = [gerar_caminho_aleatorio() for _ in range(40)]
+    for _ in range(500):
+        filhos = gerar_filhos(pais)
+        pais = selecionar_pais(grafo, filhos, teste="torneio")
+    return pais
+
+def plotar_caminho(caminho):
+    data = abrir_arquivo()
+    for x,y in data:
+        plt.scatter(x,y, c="black", s=16)
+    caminho = gerar_caminho_aleatorio()
+    for a, b in zip(caminho, caminho[1:]):
+        plt.plot([data[a][0], data[b][0]], [data[a][1], data[b][1]], c = "black")
+    plt.show()
+
+
+print(distancia_caminho(gerar_grafo(), min(genetico(), key=lambda x: distancia_caminho(gerar_grafo(), x))))
+print(distancia_caminho(gerar_grafo(), min(genetico(), key=lambda x: distancia_caminho(gerar_grafo(), x))))
+print(distancia_caminho(gerar_grafo(), min(genetico(), key=lambda x: distancia_caminho(gerar_grafo(), x))))
+print(distancia_caminho(gerar_grafo(), min(genetico(), key=lambda x: distancia_caminho(gerar_grafo(), x))))
+
+plotar_caminho(min(genetico(), key=lambda x: distancia_caminho(gerar_grafo(), x)))
+plotar_caminho(min(genetico(), key=lambda x: distancia_caminho(gerar_grafo(), x)))
+plotar_caminho(min(genetico(), key=lambda x: distancia_caminho(gerar_grafo(), x)))
+plotar_caminho(min(genetico(), key=lambda x: distancia_caminho(gerar_grafo(), x)))
+
