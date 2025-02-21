@@ -11,9 +11,12 @@ def abrir_arquivo(nome_arquivo : str = "berlin52.csv") -> List[Tuple[float, floa
             cordenadas.append((float(linha[0]), float(linha[1])))
     return cordenadas
 
-def gerar_grafo(nome_arquivo : str = "berlin52.csv") -> Grafo:
+def gerar_grafo(nome_arquivo : str = "berlin52.csv", aleatorio=False,tam=52) -> Grafo:
     grafo = dict()
-    cordenadas = abrir_arquivo(nome_arquivo)
+    if not aleatorio:
+        cordenadas = abrir_arquivo(nome_arquivo)
+    else:
+        cordenadas = [(random.randint(1,1000), random.randint(1,1000)) for _ in range(tam)]
 
     for i, ponto_a in enumerate(cordenadas):
         distancias = dict()
@@ -66,20 +69,20 @@ def selecionar_pais(grafo : Grafo, candidatos : List[List[int]], teste = "tornei
             pais.append(candidatoA if distancia_caminho(grafo, candidatoA) < distancia_caminho(grafo, candidatoB) else candidatoB)
         return pais
 
-def trocar_gene(caminho : List[int], indicie : int, gene : int) -> None:
-    for i in range(len(caminho)):
-        if caminho[i] == gene:
-            indicie_trocar = i
-            break
-    caminho[indicie], caminho[indicie_trocar] = caminho[indicie_trocar], caminho[indicie]
+def pmx(caminho_a : List[int], caminho_b : List[int], separador : int) -> Tuple[List[int], List[int]]:
 
-def crossover(a : List[int], b : List[int]) -> Tuple[List[int], List[int]]:
-    indicie_troca = random.randrange(0, len(a))
-    res_a, res_b = a[:], b[:]
-    for i in range(indicie_troca):
-        trocar_gene(res_a, i, b[i])
-        trocar_gene(res_b, i, a[i])
-    return res_a, res_b
+    for indicie_a, gene_a in enumerate(caminho_a[:separador]):
+        for indicie_b, gene_b in enumerate(caminho_b):
+            if gene_a == gene_b:
+                caminho_b[indicie_a], caminho_b[indicie_b] = caminho_b[indicie_b], caminho_b[indicie_a]
+    return caminho_a, caminho_b 
+
+def crossover(pai_a : List[int], pai_b : List[int]) -> Tuple[List[int], List[int]]:
+    separador = random.randrange(0, len(pai_a))
+    a, b = pmx(pai_a, pai_b, separador)
+    filho_a = a[:separador] + b[separador:]
+    filho_b = b[:separador] + a[separador:]
+    return filho_a, filho_b
 
 def mutacao(caminho : List[int], p : float = 0.1) -> None:
     for i in range(len(caminho)):
@@ -94,7 +97,7 @@ def gerar_filhos(pais : List[List[int]], p_mutacao : float = 0.1, p_filho : floa
         pai_b = pais.pop(random.randrange(0, len(pais)))
         if p_filho >= random.random():
             filhos.extend(crossover(pai_a, pai_b))
-            filhos.extend(crossover(pai_a, pai_b))
+            filhos.extend(crossover(pai_b, pai_a))
         else:
             filhos.extend((pai_a,pai_b,pai_a,pai_b))
     for filho in filhos:
@@ -105,16 +108,20 @@ def genetico(
         nome_arquivo : str = "berlin52.csv",
         n_populacao : int = 40,
         n_geracoes : int = 1000,
-        teste = "torneio"
+        p_mutacao : float = 0.05,
+        p_cruzamento : float = 0.90,
+        teste = "torneio",
+        aleatorio : bool = False
 ):
-    grafo = gerar_grafo(nome_arquivo)
+    grafo = gerar_grafo(nome_arquivo, aleatorio=aleatorio)
     pais = [gerar_caminho_aleatorio(grafo) for _ in range(n_populacao)]
 
     for _ in range(n_geracoes):
-        filhos = gerar_filhos(pais)
+        filhos = gerar_filhos(pais, p_mutacao=p_mutacao, p_filho=p_cruzamento)
         pais = selecionar_pais(grafo, filhos, teste)
     
-    return min(pais, key=lambda x: distancia_caminho(grafo, x))
+    menor_caminho = min(pais, key=lambda x: distancia_caminho(grafo, x))
+    return distancia_caminho(grafo, menor_caminho), menor_caminho
 
 def plotar_caminho(caminho):
     data = abrir_arquivo()
@@ -126,8 +133,5 @@ def plotar_caminho(caminho):
 
 
 if __name__ == "__main__":
-    caminho = genetico()
-    grafo = gerar_grafo()
-
-    print(distancia_caminho(grafo, caminho))
-    plotar_caminho(caminho)
+    d, caminho = genetico()
+    print(f"{d}\n{caminho}")
