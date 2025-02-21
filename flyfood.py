@@ -36,18 +36,16 @@ def distancia(a,b,matriz): # encontra a distancia entre 2 casas
     return (distancia_x ** 2 + distancia_y ** 2) ** 0.5 # Distância euclideana
 
 
-def permutar(lista, permutacoes = [], passo = 0):
+def permutar(lista, passo = 0):
 
     if passo == len(lista): # Caso base
-        permutacoes.append(lista[:]) # Salva uma cópia da lista se tiver terminado as permutações
+        yield lista # Salva uma cópia da lista se tiver terminado as permutações
+    else:
+        for index in range(passo, len(lista)): 
 
-    for index in range(passo, len(lista)): 
-
-        lista[passo], lista[index] = lista[index], lista[passo]
-        permutar(lista, permutacoes, passo + 1)
-
-        lista[passo], lista[index] = lista[index], lista[passo] # Restaura estado da linha para evitar repetição 
-    return permutacoes
+            lista[passo], lista[index] = lista[index], lista[passo]
+            yield from permutar(lista, passo + 1)
+            lista[passo], lista[index] = lista[index], lista[passo] # Restaura estado da linha para evitar repetição 
 
 
 def forca_bruta(matriz):
