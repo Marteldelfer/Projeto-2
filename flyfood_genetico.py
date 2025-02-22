@@ -1,9 +1,10 @@
 import csv, math, random, tqdm, matplotlib.pyplot as plt, numpy as np
-from typing import List, Tuple, Dict, Iterable
+from typing import List, Tuple
 
-Grafo = Dict[int, Dict[int, float]]
+Grafo = List[List[float]]
 
 def abrir_arquivo(nome_arquivo : str = "berlin52.csv") -> List[Tuple[float, float]]:
+    """Abre um arquivo csv e retorna uma lista de cordenadas [(x1,y1), ..., (xn,yn)]"""
     with open(nome_arquivo) as f:
         b52 = csv.reader(f)
         cordenadas = []
@@ -11,23 +12,29 @@ def abrir_arquivo(nome_arquivo : str = "berlin52.csv") -> List[Tuple[float, floa
             cordenadas.append((float(linha[0]), float(linha[1])))
     return cordenadas
 
-def gerar_grafo(nome_arquivo : str = "berlin52.csv") -> Grafo:
-    grafo = dict()
-    cordenadas = abrir_arquivo(nome_arquivo)
-
-    for i, ponto_a in enumerate(cordenadas):
-        distancias = dict()
-        for j, ponto_b in enumerate(cordenadas):
-            if i == j: # Evitar laços
-                continue
-            distancias[j] = distancia(*ponto_a, *ponto_b)
-        grafo[i] = distancias
-    return grafo
-
 def distancia(x1 : float, y1 : float, x2 : float, y2 : float) -> float:
+    """Calcula a distância euclidiana entre dois pontos"""
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
+def gerar_grafo(nome_arquivo : str = "berlin52.csv") -> Grafo:
+    """
+    Transforma o arquivo em grafo de distâncias (List[List[float]])
+    
+    Para acessar a distância entre dois pontos A e B, basta acessar
+    `grafo[A][B]`, sendo A e B inteiros
+    """
+    grafo = []
+    cordenadas = abrir_arquivo(nome_arquivo)
+
+    for ponto_a in cordenadas:
+        distancias = []
+        for ponto_b in cordenadas:
+            distancias.append(distancia(*ponto_a, *ponto_b))
+        grafo.append(distancias)
+    return grafo
+
 def distancia_caminho(grafo : Grafo, caminho : List[int]) -> float:
+    """Retorna a distância total percorrida em um caminho em um grafo"""
     res = 0
     for a, b in zip(caminho, caminho[1:]):
         res += grafo[a][b]
@@ -35,6 +42,7 @@ def distancia_caminho(grafo : Grafo, caminho : List[int]) -> float:
     return res
 
 def melhor_distancia(grafo : Grafo, caminhos : List[List[int]]) -> Tuple[float, List[int]]:
+    """Retorna o menor caminho de uma lista de caminhos"""
     m_distancia = float('inf')
     m_caminho = None
 
@@ -46,11 +54,17 @@ def melhor_distancia(grafo : Grafo, caminhos : List[List[int]]) -> Tuple[float, 
     return m_distancia, m_caminho
 
 def gerar_caminho_aleatorio(grafo : Grafo) -> List[int]:
+    """Gera um caminho aleátorio dentro de um grafo"""
     res = list(range(0,len(grafo)))
     random.shuffle(res)
     return res
 
 def selecionar_pais(grafo : Grafo, candidatos : List[List[int]]) -> List[List[int]]:
+    """
+    Retorna uma lista de caminhos pais para um algoritmo genético
+
+    Os caminhos são selecionados via torneio
+    """
     pais = []
     for _ in range(len(candidatos) // 2):
         candidatoA = candidatos.pop(random.randrange(0, len(candidatos)))
@@ -59,12 +73,14 @@ def selecionar_pais(grafo : Grafo, candidatos : List[List[int]]) -> List[List[in
     return pais
 
 def trocar(filho : List[int], indicie : int, gene : int) -> None:
+    """Função auxiliar, coloca um elemento em `gene` em `filho[indicie]`"""
     for i, g in enumerate(filho):
         if gene == g:
             filho[indicie], filho[i] = filho[i], filho[indicie]
             break 
 
 def pmx(caminho_a : List[int], caminho_b : List[int]) -> Tuple[List[int], List[int]]:
+    """Função auxilia, retorna os filhos gerados pelo cruzamento de dois pais"""
     separador = random.randrange(0, len(caminho_a))
     filho_a = caminho_a[:]
     filho_b = caminho_b[:]
@@ -84,16 +100,24 @@ def pmx(caminho_a : List[int], caminho_b : List[int]) -> Tuple[List[int], List[i
         
 
 def mutacao(caminho : List[int], p : float = 0.1) -> None:
+    """Troca dois genes aleatórios com probabilidade p"""
     if p > random.random():
         i_a, i_b = (random.randrange(0, len(caminho)) for _ in range(2))
         caminho[i_a], caminho[i_b] = caminho[i_b], caminho[i_a]
 
-def gerar_filhos(pais : List[List[int]], p_mutacao : float = 0.1, p_filho : float = 0.95) -> List[List[int]]:
+def gerar_filhos(pais : List[List[int]], p_mutacao : float = 0.1, p_cruzamento : float = 0.95) -> List[List[int]]:
+    """
+    Gera uma geração de filhos para o algoritmo genético
+    
+    p_mutacao -> chance de mutação para cada filho
+
+    p_cruzamento -> chance de de dois pais gerarem filho
+    """
     filhos = []
     while pais:
         pai_a = pais.pop(random.randrange(0, len(pais)))
         pai_b = pais.pop(random.randrange(0, len(pais)))
-        if p_filho >= random.random():
+        if p_cruzamento >= random.random():
             filhos.extend(pmx(pai_a, pai_b))
         else:
             filhos.extend((pai_a,pai_b,pai_a,pai_b))
@@ -109,6 +133,18 @@ def genetico(
         p_mutacao : float = 0.05,
         p_cruzamento : float = 0.90,
 ):
+    """
+    Código principal, retorna a menor distância e o menor caminho encontrado
+
+    n_populacao -> tamanho de cada população
+
+    n_geracoes -> número de gerações. Quanto mais gerações, maior o tempo do
+    algoritmo
+
+    p_mutacao -> chance de mutação para cada filho
+    
+    p_cruzamento -> chance de de dois pais gerarem filho
+    """
     grafo = gerar_grafo(nome_arquivo)
     pais = [gerar_caminho_aleatorio(grafo) for _ in range(n_populacao)]
 
@@ -130,6 +166,6 @@ def plotar_caminho(caminho):
 
 
 if __name__ == "__main__":
-    d, caminho = genetico(n_populacao=40, n_geracoes=5000, p_mutacao=0.05)
+    d, caminho = genetico()
     print(f"{d}  {caminho}")
     plotar_caminho(caminho)
