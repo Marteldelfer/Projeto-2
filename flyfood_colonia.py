@@ -1,4 +1,4 @@
-from entrada import gerar_grafo, abrir_arquivo, Grafo
+from auxiliar import gerar_grafo, abrir_arquivo, plotar_caminho,Grafo
 from typing import List, Tuple
 from random import random
 import matplotlib.pyplot as plt
@@ -134,17 +134,6 @@ def colonia(
     return melhor_distancia, melhor_rota, log
 
 
-def plotar_caminho(caminho, distancia):
-    data = abrir_arquivo("berlin52.csv")
-    plt.title(str(distancia))
-    for x,y in data:
-        plt.scatter(x,y, c="black", s=16)
-    for i in range(len(caminho)):
-        plt.plot([data[caminho[i]][0], data[caminho[i-1]][0]], [data[caminho[i]][1], data[caminho[i-1]][1]], c = "black")
-    plt.show()
-    plt.close()
-
-
 if __name__ == "__main__":
     C_FEROMONIOS = 5
     C_PROXIMIDADE = 300
@@ -154,7 +143,4 @@ if __name__ == "__main__":
     feromonios_iniciais = 0.5
     n_geracoes = 50
     distancia, melhor, log = colonia()
-    for i in log.items():
-        print(i)
-        break
-    plotar_caminho(melhor, distancia)
+    plotar_caminho(melhor, abrir_arquivo(),titulo=distancia)

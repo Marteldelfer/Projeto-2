@@ -1,12 +1,13 @@
-from entradaDoRecozimento import carregar_mapa, calcular_distancia
+from auxiliar import abrir_arquivo, distancia
 from typing import Dict, Tuple, List
 import math
+import tqdm
 import random
 import matplotlib.pyplot as plt
 
 def preparar_localizacoes(nome_arquivo: str = "berlin52.csv") -> Dict[str, Tuple[float, float]]:
  
-    coordenadas = carregar_mapa(nome_arquivo)
+    coordenadas = abrir_arquivo(nome_arquivo)
     localizacoes = {str(i+1): coordenadas[i] for i in range(len(coordenadas))}
     return localizacoes
 
@@ -18,12 +19,12 @@ def calcular_caminho_total(caminho: List[str], localizacoes: Dict[str, Tuple[flo
     for cidade in caminho:
         x1, y1 = localizacoes[cidade_atual]
         x2, y2 = localizacoes[cidade]
-        distancia_total += calcular_distancia(x1, y1, x2, y2)
+        distancia_total += distancia(x1, y1, x2, y2)
         cidade_atual = cidade
     
     x1, y1 = localizacoes[cidade_atual]
     x2, y2 = localizacoes["1"]
-    distancia_total += calcular_distancia(x1, y1, x2, y2)
+    distancia_total += distancia(x1, y1, x2, y2)
 
     return distancia_total
 
@@ -44,6 +45,7 @@ def otimizar_rota(localizacoes: Dict[str, Tuple[float, float]],
     melhor_distancia = distancia_atual
 
     temperatura = temp_inicial
+    t = tqdm.tqdm()
     while temperatura > temp_minima:
         for _ in range(iteracoes_por_temp):
 
@@ -61,9 +63,10 @@ def otimizar_rota(localizacoes: Dict[str, Tuple[float, float]],
                 if distancia_atual < melhor_distancia:
                     melhor_caminho = caminho_atual[:]
                     melhor_distancia = distancia_atual
-
+        
         temperatura *= resfriamento
-
+        t.set_description(f"Temperatura : {(temperatura - temp_minima):.5f} | Distânciaa : {melhor_distancia:.5f}")
+    t.close()
     return melhor_caminho, melhor_distancia
 
 def exibir_rota(caminho: List[str], localizacoes: Dict[str, Tuple[float, float]], distancia: float):

@@ -1,8 +1,20 @@
 from flyfood_colonia import *
 from flyfood_genetico import *
-from entrada import plotar_caminho
+from auxiliar import plotar_caminho
+from typing import List, Tuple
 import random, time, tqdm, math, matplotlib.pyplot as plt
 import imageio
+
+def gerar_coordenadas_aleatorias(pontos : int = 52, x : int = 1000, y : int = 1000) -> Tuple[Grafo, List[Tuple[int, int]]]:
+    # Gerar cordenadas
+    cordenadas = [(random.randrange(1, x), random.randrange(1, y)) for _ in range(pontos)]
+    # Savar mapa
+    with open(f"mapas/{pontos}_pontos", 'w') as f:
+        csv.writer(f).writerows(cordenadas)
+    # Gerar grafo
+    grafo = gerar_grafo(f"mapas/{pontos}_pontos")
+
+    return grafo, cordenadas
 
 def genetico_teste(
         nome_arquivo : str = "berlin52.csv",
@@ -91,9 +103,8 @@ def colonia_teste(
 
     return melhor_distancia, melhor_rota, log
 
-"""
-colonia_teste(n_geracoes=25, plot=True)
-paths = [f"figs/genético_{gen}.png" for gen in range(25)]
-ims = [imageio.imread(f) for f in paths]
-imageio.mimwrite("gifs/genético.gif", ims)
-"""
+
+grafo, coordenadas = gerar_grafo(), abrir_arquivo()
+
+dist, rota, log = colonia(grafo)
+plotar_caminho(rota, coordenadas)

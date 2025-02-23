@@ -1,58 +1,9 @@
 import csv, math, random, tqdm, matplotlib.pyplot as plt, numpy as np
-from entrada import plotar_caminho
+from auxiliar import plotar_caminho, gerar_grafo, distancia_caminho, abrir_arquivo
 from typing import List, Tuple
 
 Grafo = List[List[float]]
 
-def abrir_arquivo(nome_arquivo : str = "berlin52.csv") -> List[Tuple[float, float]]:
-    """Abre um arquivo csv e retorna uma lista de cordenadas [(x1,y1), ..., (xn,yn)]"""
-    with open(nome_arquivo) as f:
-        b52 = csv.reader(f)
-        cordenadas = []
-        for linha in b52:
-            cordenadas.append((float(linha[0]), float(linha[1])))
-    return cordenadas
-
-def distancia(x1 : float, y1 : float, x2 : float, y2 : float) -> float:
-    """Calcula a distância euclidiana entre dois pontos"""
-    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-
-def gerar_grafo(nome_arquivo : str = "berlin52.csv") -> Grafo:
-    """
-    Transforma o arquivo em grafo de distâncias (List[List[float]])
-    
-    Para acessar a distância entre dois pontos A e B, basta acessar
-    `grafo[A][B]`, sendo A e B inteiros
-    """
-    grafo = []
-    cordenadas = abrir_arquivo(nome_arquivo)
-
-    for ponto_a in cordenadas:
-        distancias = []
-        for ponto_b in cordenadas:
-            distancias.append(distancia(*ponto_a, *ponto_b))
-        grafo.append(distancias)
-    return grafo
-
-def distancia_caminho(grafo : Grafo, caminho : List[int]) -> float:
-    """Retorna a distância total percorrida em um caminho em um grafo"""
-    res = 0
-    for a, b in zip(caminho, caminho[1:]):
-        res += grafo[a][b]
-    res += grafo[caminho[-1]][caminho[0]]
-    return res
-
-def melhor_distancia(grafo : Grafo, caminhos : List[List[int]]) -> Tuple[float, List[int]]:
-    """Retorna o menor caminho de uma lista de caminhos"""
-    m_distancia = float('inf')
-    m_caminho = None
-
-    for caminho in caminhos:
-        nova_distancia = distancia_caminho(grafo, caminho)
-        if nova_distancia < m_distancia:
-            m_distancia = nova_distancia
-            m_caminho = caminho
-    return m_distancia, m_caminho
 
 def gerar_caminho_aleatorio(grafo : Grafo) -> List[int]:
     """Gera um caminho aleátorio dentro de um grafo"""
@@ -129,8 +80,8 @@ def gerar_filhos(pais : List[List[int]], p_mutacao : float = 0.1, p_cruzamento :
 
 def genetico(
         nome_arquivo : str = "berlin52.csv",
-        n_populacao : int = 100,
-        n_geracoes : int = 4000,
+        n_populacao : int = 60,
+        n_geracoes : int = 2000,
         p_mutacao : float = 0.05,
         p_cruzamento : float = 0.90,
 ):
@@ -159,5 +110,7 @@ def genetico(
 
 if __name__ == "__main__":
     d, caminho = genetico()
+    cordenadas = abrir_arquivo()
+
     print(f"{d}  {caminho}")
-    plotar_caminho(caminho)
+    plotar_caminho(caminho, cordenadas, titulo=d)
