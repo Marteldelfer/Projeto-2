@@ -79,7 +79,7 @@ def gerar_filhos(pais : List[List[int]], p_mutacao : float = 0.1, p_cruzamento :
     return filhos
 
 def genetico(
-        nome_arquivo : str = "berlin52.csv",
+        grafo : Grafo = gerar_grafo("berlin52.csv"),
         n_populacao : int = 60,
         n_geracoes : int = 2000,
         p_mutacao : float = 0.05,
@@ -97,7 +97,6 @@ def genetico(
     
     p_cruzamento -> chance de de dois pais gerarem filho
     """
-    grafo = gerar_grafo(nome_arquivo)
     pais = [gerar_caminho_aleatorio(grafo) for _ in range(n_populacao)]
 
     for _ in (t:= tqdm.trange(n_geracoes)):

@@ -105,7 +105,7 @@ def colonia(
         taxa_evaporacao : float = 0.7,
         feromonios_iniciais :float = 0.5,
         n_geracoes : int = 100
-) -> Tuple:
+) -> Tuple[float, List[int]]:
     """
     O algoritmo propriamente dito. Retorna a menor distancia, o menor caminho e um 
     registro de cada geração.

@@ -1,5 +1,6 @@
 from flyfood_colonia import *
 from flyfood_genetico import *
+from flyfood_recozimento import *
 from auxiliar import plotar_caminho
 from typing import List, Tuple
 import random, time, tqdm, math, matplotlib.pyplot as plt
@@ -103,8 +104,17 @@ def colonia_teste(
 
     return melhor_distancia, melhor_rota, log
 
+if __name__ == "__main__":
 
-grafo, coordenadas = gerar_grafo(), abrir_arquivo()
+    for n_pontos in range(10, 101, 20):
+        grafo, cordenadas = gerar_coordenadas_aleatorias(n_pontos)
+        menor_genetico, _ = genetico(grafo)
+        print() 
+        menor_colonia, _, _ = colonia(grafo)
+        print()
+        _, menor_cozimento = otimizar_rota(cordenadas)
+        print()
 
-dist, rota, log = colonia(grafo)
-plotar_caminho(rota, coordenadas)
+        plt.bar(["1","2","3"], [menor_genetico, menor_colonia, menor_cozimento])
+        plt.show()
+        plt.clf()
