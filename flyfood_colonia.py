@@ -1,14 +1,27 @@
-from entrada import gerar_grafo, abrir_arquivo
+from entrada import gerar_grafo, abrir_arquivo, Grafo
+from typing import List, Tuple
 from random import random
 import matplotlib.pyplot as plt
+import tqdm
 
-mapa = gerar_grafo(r"flyfoood\berlin52.csv")
+mapa = gerar_grafo("berlin52.csv")
 
-def encontrar_na_tabela(a,b,tabela):
+def encontrar_na_tabela(a : int, b : int, tabela : List[List[float]]) -> float:
     return tabela[max(a,b)][min(a,b)]
 
 
-def proximo_ponto(feromonios, alfa, proximidades, beta, ponto_atual, pontos):
+def proximo_ponto(
+        feromonios : List[List[float]], # Matriz de float 
+        alfa : float, 
+        proximidades : List[List[float]], # Matriz de float 
+        beta : float, 
+        ponto_atual : int, # Cidade
+        pontos : List[int] # Lista de cidades
+        ) -> int:
+    """
+    Encontra o proximo ponto com chance proporcional ao `feromonio^alfa * proximidade^beta`
+    """
+
     possibilidades = [encontrar_na_tabela(ponto_atual,i,feromonios)**alfa * encontrar_na_tabela(ponto_atual,i,proximidades)**beta for i in pontos]
     total = sum(possibilidades)
     escolha = random()
@@ -20,28 +33,54 @@ def proximo_ponto(feromonios, alfa, proximidades, beta, ponto_atual, pontos):
     return pontos[-1] # para caso ocorra um erro por aproximação decimal e a escolha seja alta demais.
 
 
-def encontrar_proximidades(mapa, Constante):
+def encontrar_proximidades(mapa : Grafo, CONSTANTE: float) -> Grafo:
+    """
+    Transforma um grafo de distancis em um grafo de proximidade
+
+    A proximidade de dois pontos é dado por `CONSTANTE / distancia`
+    """
+
     proximidades = [[0] * i for i in range(len(mapa))]
     for a in range(len(proximidades)):
         for b in range(len(proximidades[a])):
-            proximidades[a][b] = Constante / mapa[a][b]
+            proximidades[a][b] = CONSTANTE / mapa[a][b]
     return proximidades
 
 
-def adicionar_feromonios(formiga, distancia, Constante_feromonios, feromonios):
+def adicionar_feromonios(
+        formiga : List[int], 
+        distancia : float, 
+        C_FEROMONIOS : float, 
+        feromonios : List[List[float]]
+        ) -> None:
+    """
+    Adiciona feromonios proporcional `C_FEROMONIOS / distancia`
+    """
     for i in range(len(formiga)):
         a = formiga[i]
         b = formiga[i-1]
-        feromonios[max(a,b)][min(a,b)] += Constante_feromonios / distancia
+        feromonios[max(a,b)][min(a,b)] += C_FEROMONIOS / distancia
 
 
-def evaporar_feromonios(feromonios, taxa_evaporacao):
+def evaporar_feromonios(
+        feromonios : List[List[float]], 
+        taxa_evaporacao : float # entre 0 e 1
+        ) -> None:
+    """Reduz feromonios de acordo com a taxa de evaporação"""
     for a in range(len(feromonios)):
         for b in range(len(feromonios[a])):
             feromonios[a][b] *= taxa_evaporacao
 
 
-def gerar_formigas(mapa, alfa, beta, feromonios, proximidades):
+def gerar_formigas(
+        mapa : Grafo, 
+        alfa : float, 
+        beta : float, 
+        feromonios : List[List[float]], 
+        proximidades : List[List[float]]
+        ) -> List[List[int]]:
+    """Retorna uma lista de caminhos gerados a partír do feromônios e proximidade"""
+
     cidades = range(len(mapa))
     formigas = [[i] for i in cidades]
     distancias = [0] * len(formigas)
@@ -57,44 +96,65 @@ def gerar_formigas(mapa, alfa, beta, feromonios, proximidades):
     return formigas, distancias
 
 
-def colonia(mapa, Constante_feromonios, Constante_proximidade, alfa, beta, taxa_evaporacao, feromonios_iniciais, qnt_geracoes):
+def colonia(
+        mapa = gerar_grafo(),
+        C_FEROMONIOS : float = 5,
+        C_PROXIMIDADE : float = 300,
+        alfa : float = 2,
+        beta : float = 2,
+        taxa_evaporacao : float = 0.7,
+        feromonios_iniciais :float = 0.5,
+        n_geracoes : int = 100
+) -> Tuple:
+    """
+    O algoritmo propriamente dito. Retorna a menor distancia, o menor caminho e um 
+    registro de cada geração.
 
-    proximidades = encontrar_proximidades(mapa, Constante_proximidade)
+    Itera `n_geracoes` vezes, atualizando feromônios a cada geração
+    """
+
+    proximidades = encontrar_proximidades(mapa, C_PROXIMIDADE)
     feromonios = [[feromonios_iniciais] * i for i in range(len(mapa))]
     melhor_rota, melhor_distancia = [], float('inf')
 
     log = {}
+    t = tqdm.trange(n_geracoes)
 
-    for gen in range(qnt_geracoes):
+    for gen in t:
         formigas, distancias = gerar_formigas(mapa, alfa, beta, feromonios, proximidades)
         log[f"geração{gen}"] = [None] * len(formigas)
         evaporar_feromonios(feromonios, taxa_evaporacao)
         for n in range(len(formigas)):
             log[f"geração{gen}"][n] = (formigas[n], distancias[n]) 
-            adicionar_feromonios(formigas[n], distancias[n], Constante_feromonios, feromonios)
+            adicionar_feromonios(formigas[n], distancias[n], C_FEROMONIOS, feromonios)
             if distancias[n] < melhor_distancia:
                 melhor_rota, melhor_distancia = formigas[n], distancias[n]
+        t.set_description(f"Melhor distância : {melhor_distancia}")
     
     return melhor_distancia, melhor_rota, log
 
 
 def plotar_caminho(caminho, distancia):
-    data = abrir_arquivo(r"flyfoood\berlin52.csv")
+    data = abrir_arquivo("berlin52.csv")
     plt.title(str(distancia))
     for x,y in data:
         plt.scatter(x,y, c="black", s=16)
     for i in range(len(caminho)):
         plt.plot([data[caminho[i]][0], data[caminho[i-1]][0]], [data[caminho[i]][1], data[caminho[i-1]][1]], c = "black")
     plt.show()
+    plt.close()
 
 
 if __name__ == "__main__":
-    Constante_feromonios = 5
-    Constante_proximidade = 300
+    C_FEROMONIOS = 5
+    C_PROXIMIDADE = 300
     alfa = 2
     beta = 2
     taxa_evaporacao = 0.7
     feromonios_iniciais = 0.5
-    qnt_geracoes = 100
-    distancia, melhor, log = colonia(mapa, Constante_feromonios, Constante_proximidade, alfa, beta, taxa_evaporacao, feromonios_iniciais, qnt_geracoes)
+    n_geracoes = 50
+    distancia, melhor, log = colonia()
+    for i in log.items():
+        print(i)
+        break
     plotar_caminho(melhor, distancia)

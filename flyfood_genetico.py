@@ -1,4 +1,5 @@
 import csv, math, random, tqdm, matplotlib.pyplot as plt, numpy as np
+from entrada import plotar_caminho
 from typing import List, Tuple
 
 Grafo = List[List[float]]
@@ -80,7 +81,7 @@ def trocar(filho : List[int], indicie : int, gene : int) -> None:
             break 
 
 def pmx(caminho_a : List[int], caminho_b : List[int]) -> Tuple[List[int], List[int]]:
-    """Função auxilia, retorna os filhos gerados pelo cruzamento de dois pais"""
+    """Função auxiliar, retorna os filhos gerados pelo cruzamento de dois pais"""
     separador = random.randrange(0, len(caminho_a))
     filho_a = caminho_a[:]
     filho_b = caminho_b[:]
@@ -128,8 +129,8 @@ def gerar_filhos(pais : List[List[int]], p_mutacao : float = 0.1, p_cruzamento :
 
 def genetico(
         nome_arquivo : str = "berlin52.csv",
-        n_populacao : int = 40,
-        n_geracoes : int = 1000,
+        n_populacao : int = 100,
+        n_geracoes : int = 4000,
         p_mutacao : float = 0.05,
         p_cruzamento : float = 0.90,
 ):
@@ -149,21 +150,12 @@ def genetico(
     pais = [gerar_caminho_aleatorio(grafo) for _ in range(n_populacao)]
 
     for _ in (t:= tqdm.trange(n_geracoes)):
-        filhos = gerar_filhos(pais, p_mutacao=p_mutacao, p_filho=p_cruzamento)
+        filhos = gerar_filhos(pais, p_mutacao=p_mutacao, p_cruzamento=p_cruzamento)
         pais = selecionar_pais(grafo, filhos)
         t.set_description(str(distancia_caminho(grafo, pais[0])))
     
     menor_caminho = min(pais, key=lambda x: distancia_caminho(grafo, x))
     return distancia_caminho(grafo, menor_caminho), menor_caminho
-
-def plotar_caminho(caminho):
-    data = abrir_arquivo()
-    for x,y in data:
-        plt.scatter(x,y, c="black", s=16)
-    for a, b in zip(caminho, caminho[1:]):
-        plt.plot([data[a][0], data[b][0]], [data[a][1], data[b][1]], c = "black")
-    plt.show()
-
 
 if __name__ == "__main__":
     d, caminho = genetico()

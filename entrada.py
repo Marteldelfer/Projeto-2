@@ -1,6 +1,19 @@
+import matplotlib.pyplot as plt
 from csv import reader
 from typing import List, Tuple
 Grafo = List[List[float]]
+
+def plotar_caminho(caminho, arquivo = "berlin52.csv", plotar = True, salvar = False, nome_fig = "fig"):
+    data = abrir_arquivo()
+    for x,y in data:
+        plt.scatter(x,y, c="black", s=16)
+    for i in range(len(caminho)):
+        plt.plot([data[caminho[i]][0], data[caminho[i-1]][0]], [data[caminho[i]][1], data[caminho[i-1]][1]], c = "black")
+    if plotar:
+        plt.show()
+    if salvar:
+        plt.savefig(f"./figs/{nome_fig}")
+    plt.clf()
 
 def abrir_arquivo(nome_arquivo : str = "berlin52.csv") -> List[Tuple[float, float]]:
     """Abre um arquivo csv e retorna uma lista de cordenadas [(x1,y1), ..., (xn,yn)]"""
