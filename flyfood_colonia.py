@@ -98,13 +98,13 @@ def gerar_formigas(
 
 def colonia(
         mapa = gerar_grafo(),
-        C_FEROMONIOS : float = 5,
-        C_PROXIMIDADE : float = 300,
-        alfa : float = 2,
-        beta : float = 2,
-        taxa_evaporacao : float = 0.7,
-        feromonios_iniciais :float = 0.5,
-        n_geracoes : int = 100
+        C_FEROMONIOS : float = 10.27,
+        C_PROXIMIDADE : float = 488.19,
+        alfa : float = 1.42,
+        beta : float = 1.65,
+        taxa_evaporacao : float = 0.70,
+        feromonios_iniciais :float = 0.19,
+        n_geracoes : int = 50
 ) -> Tuple[float, List[int]]:
     """
     O algoritmo propriamente dito. Retorna a menor distancia, o menor caminho e um 
@@ -117,30 +117,20 @@ def colonia(
     feromonios = [[feromonios_iniciais] * i for i in range(len(mapa))]
     melhor_rota, melhor_distancia = [], float('inf')
 
-    log = {}
     t = tqdm.trange(n_geracoes)
 
     for gen in t:
         formigas, distancias = gerar_formigas(mapa, alfa, beta, feromonios, proximidades)
-        log[f"geração{gen}"] = [None] * len(formigas)
         evaporar_feromonios(feromonios, taxa_evaporacao)
         for n in range(len(formigas)):
-            log[f"geração{gen}"][n] = (formigas[n], distancias[n]) 
             adicionar_feromonios(formigas[n], distancias[n], C_FEROMONIOS, feromonios)
             if distancias[n] < melhor_distancia:
                 melhor_rota, melhor_distancia = formigas[n], distancias[n]
         t.set_description(f"Melhor distância : {melhor_distancia}")
     
-    return melhor_distancia, melhor_rota, log
+    return melhor_distancia, melhor_rota
 
 
 if __name__ == "__main__":
-    C_FEROMONIOS = 5
-    C_PROXIMIDADE = 300
-    alfa = 2
-    beta = 2
-    taxa_evaporacao = 0.7
-    feromonios_iniciais = 0.5
-    n_geracoes = 50
-    distancia, melhor, log = colonia()
+    distancia, melhor = colonia()
     plotar_caminho(melhor, abrir_arquivo(),titulo=distancia)
