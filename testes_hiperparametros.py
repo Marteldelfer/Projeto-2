@@ -50,7 +50,7 @@ def reduzir_variancias(vars):
 
 def testes():
     writer = pd.ExcelWriter("testes_hparametros.xlsx", engine='xlsxwriter')
-    mapa = gerar_grafo(r"flyfoood\berlin52.csv")
+    mapa = gerar_grafo(r"berlin52.csv")
     hparams = {
         'C_FEROMONIOS': 5,
         'C_PROXIMIDADE': 300,
