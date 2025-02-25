@@ -23,7 +23,7 @@ def dez_testes(mapa, **hparams):
                     beta=hparams['beta'],
                     taxa_evaporacao=hparams['taxa_evaporacao'],
                     feromonios_iniciais=hparams['feromonios_iniciais'],
-                    n_geracoes=50)[0] # o numero de gerações precisa ser um inteiro e será testado separadamente
+                    n_geracoes=50)[0]
         valores.append(x)
     
     media = sum(valores) / 10
@@ -47,25 +47,18 @@ def reduzir_variancias(vars):
         vars[v] /= 5
         t += vars[v]
 
-    
 
 def testes():
     writer = pd.ExcelWriter("testes_hparametros.xlsx", engine='xlsxwriter')
     mapa = gerar_grafo(r"flyfoood\berlin52.csv")
-    hparams = {'C_FEROMONIOS': 10.271652869964084,
-            'C_PROXIMIDADE': 488.19131933743853, 
-            'alfa': 1.4241657339679301, 
-            'beta': 1.6539196725944303, 
-            'taxa_evaporacao': 0.703799573110024, 
-            'feromonios_iniciais': 0.19370085074994714}
-    # hparams = {
-    #     'C_FEROMONIOS': 5,
-    #     'C_PROXIMIDADE': 300,
-    #     'alfa': 3,
-    #     'beta': 3,
-    #     'taxa_evaporacao': 0.5,
-    #     'feromonios_iniciais': 0.5,
-    # }
+    hparams = {
+        'C_FEROMONIOS': 5,
+        'C_PROXIMIDADE': 300,
+        'alfa': 3,
+        'beta': 3,
+        'taxa_evaporacao': 0.5,
+        'feromonios_iniciais': 0.5,
+    }
     variancias = {
         'C_FEROMONIOS': 10,
         'C_PROXIMIDADE': 250,
@@ -86,7 +79,7 @@ def testes():
     melhor, h_melhor, vmelhor = float('inf'), {}, 0
     x = 0
     iteracao = 0
-    while x < 6:
+    while x < 4:
         iteracao += 1
         n = 0
 
@@ -111,7 +104,7 @@ def testes():
 
         df = pd.DataFrame(tabela)
         df.to_excel(writer, sheet_name=f'iteracao_{iteracao}', header=[i for i in tabela], index=False)
-    print(h_melhor, melhor, v)
+    print(h_melhor, melhor, vmelhor)
     writer.close()
 
 
