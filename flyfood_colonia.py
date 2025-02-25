@@ -1,6 +1,6 @@
 from auxiliar import gerar_grafo, abrir_arquivo, plotar_caminho,Grafo
 from typing import List, Tuple
-from random import random
+from random import random, seed
 import matplotlib.pyplot as plt
 import tqdm
 
@@ -100,8 +100,8 @@ def colonia(
         mapa = gerar_grafo(),
         C_FEROMONIOS : float = 10.27,
         C_PROXIMIDADE : float = 488.19,
-        alfa : float = 1.42,
-        beta : float = 1.65,
+        alfa : float = 1.42, # importância dos feromônios
+        beta : float = 1.65, # importância das proximidades
         taxa_evaporacao : float = 0.70,
         feromonios_iniciais :float = 0.19,
         n_geracoes : int = 50
@@ -132,5 +132,7 @@ def colonia(
 
 
 if __name__ == "__main__":
+    s = 0.372921903692934 # melhor resultado encontrado
+    seed(s)
     distancia, melhor = colonia()
     plotar_caminho(melhor, abrir_arquivo(),titulo=distancia)
