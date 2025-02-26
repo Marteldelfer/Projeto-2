@@ -22,7 +22,7 @@ def calcular_caminho_total(caminho: List[int], localizacoes: List[Tuple[float, f
 
     return distancia_total
 
-def otimizar_rota(localizacoes: List[Tuple[float, float]],
+def otimizar_rota(localizacoes: List[Tuple[float, float]] = abrir_arquivo(),
                   temp_inicial: float = 1000,
                   temp_minima: float = 1e-8,
                   resfriamento: float = 0.995,

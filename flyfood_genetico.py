@@ -4,6 +4,15 @@ from typing import List, Tuple
 
 Grafo = List[List[float]]
 
+def encontrar_menor_caminho(grafo : Grafo, caminhos : List[List[int]]) -> List[int]:
+    menor_distancia = float("inf")
+    menor_caminho = None
+    for caminho in caminhos:
+        distancia = distancia_caminho(caminho)
+        if distancia < menor_distancia:
+            menor_distancia = distancia
+            menor_caminho = caminho
+    return menor_caminho
 
 def gerar_caminho_aleatorio(grafo : Grafo) -> List[int]:
     """Gera um caminho aleátorio dentro de um grafo"""
@@ -104,7 +113,7 @@ def genetico(
         pais = selecionar_pais(grafo, filhos)
         t.set_description(str(distancia_caminho(grafo, pais[0])))
     
-    menor_caminho = min(pais, key=lambda x: distancia_caminho(grafo, x))
+    menor_caminho = encontrar_menor_caminho(pais, key=lambda x: distancia_caminho(grafo, x))
     return distancia_caminho(grafo, menor_caminho), menor_caminho
 
 if __name__ == "__main__":

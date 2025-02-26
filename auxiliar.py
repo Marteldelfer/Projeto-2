@@ -3,18 +3,6 @@ from csv import reader
 from typing import List, Tuple
 Grafo = List[List[float]]
 
-def plotar_caminho(caminho, coordenadas, plotar = True, salvar = False, nome_fig = "fig", titulo = "titulo"):
-    for x,y in coordenadas:
-        plt.scatter(x,y, c="black", s=16)
-    for i in range(len(caminho)):
-        plt.plot([coordenadas[caminho[i]][0], coordenadas[caminho[i-1]][0]], [coordenadas[caminho[i]][1], coordenadas[caminho[i-1]][1]], c = "black")
-    plt.title(titulo)
-    
-    if plotar:
-        plt.show()
-    if salvar:
-        plt.savefig(f"./figs/{nome_fig}")
-    plt.clf()
 
 def abrir_arquivo(nome_arquivo : str = "berlin52.csv") -> List[Tuple[float, float]]:
     """Abre um arquivo csv e retorna uma lista de cordenadas [(x1,y1), ..., (xn,yn)]"""
@@ -24,6 +12,22 @@ def abrir_arquivo(nome_arquivo : str = "berlin52.csv") -> List[Tuple[float, floa
         for linha in b52:
             cordenadas.append((float(linha[0]), float(linha[1])))
     return cordenadas
+
+def plotar_caminho(caminho, dist, coordenadas = abrir_arquivo(), plotar = True, salvar = False, nome_fig = "fig", titulo = "titulo"):
+    for x,y in coordenadas:
+        plt.scatter(x,y, c="black", s=16)
+    for i in range(len(caminho)):
+        plt.plot([coordenadas[caminho[i]][0], coordenadas[caminho[i-1]][0]], [coordenadas[caminho[i]][1], coordenadas[caminho[i-1]][1]], c = "black", label='_no_legend')
+    label=f"{dist:.2f}"
+    plt.plot([0,0],[0,0],label=f"Distância : {label}",alpha=0)
+    plt.legend()
+    plt.title(titulo)
+    
+    if plotar:
+        plt.show()
+    if salvar:
+        plt.savefig(f"./figs/{nome_fig}")
+    plt.clf()
 
 def distancia(x1 : float, y1 : float, x2 : float, y2 : float) -> float:
     """Calcula a distância euclidiana entre dois pontos"""
