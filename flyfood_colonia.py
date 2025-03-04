@@ -4,8 +4,6 @@ from random import random, seed
 import matplotlib.pyplot as plt
 import tqdm
 
-mapa = gerar_grafo("berlin52.csv")
-
 def encontrar_na_tabela(a : int, b : int, tabela : List[List[float]]) -> float:
     return tabela[max(a,b)][min(a,b)]
 
@@ -23,7 +21,7 @@ def proximo_ponto(
     """
 
     possibilidades = [encontrar_na_tabela(ponto_atual,i,feromonios)**alfa * encontrar_na_tabela(ponto_atual,i,proximidades)**beta for i in pontos]
-    total = sum(possibilidades)
+    total = sum(i if i > 0 else 0.001 for i in possibilidades)
     escolha = random()
     n = 0
     for i in range(len(possibilidades)):
@@ -104,7 +102,7 @@ def colonia(
         beta : float = 1.65, # importância das proximidades
         taxa_evaporacao : float = 0.70,
         feromonios_iniciais :float = 0.19,
-        n_geracoes : int = 50
+        n_geracoes : int = 30
 ) -> Tuple[float, List[int]]:
     """
     O algoritmo propriamente dito. Retorna a menor distancia, o menor caminho e um 
@@ -126,7 +124,7 @@ def colonia(
             adicionar_feromonios(formigas[n], distancias[n], C_FEROMONIOS, feromonios)
             if distancias[n] < melhor_distancia:
                 melhor_rota, melhor_distancia = formigas[n], distancias[n]
-        t.set_description(f"Melhor distância : {melhor_distancia}")
+        t.set_description(f"Melhor distância : {melhor_distancia:0.4f}")
     
     return melhor_distancia, melhor_rota
 

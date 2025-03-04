@@ -7,7 +7,7 @@ import random, time, tqdm, math, matplotlib.pyplot as plt
 import imageio
 from os import listdir, unlink
 from os.path import isfile, join
-import threading
+from abrir_tsplib import e_numero
 
 def gerar_coordenadas_aleatorias(pontos : int = 52, x : int = 1000, y : int = 1000) -> Tuple[Grafo, List[Tuple[int, int]]]:
     # Gerar cordenadas
@@ -188,7 +188,14 @@ def otimizar_rota_teste(localizacoes: List[Tuple[float, float]] = abrir_arquivo(
     t.close()
     return melhor_caminho, melhor_distancia
 
-
+def tamanho_grafo(nome : str) -> int:
+    nome = nome[:-4]
+    res = ""
+    for letra in nome[::-1]:
+        if not e_numero(letra):
+            break
+        res += letra
+    return int(res[::-1])
 
 
 if __name__ == "__main__": 
@@ -221,7 +228,7 @@ if __name__ == "__main__":
     plt.bar(x, res3)
     plt.show()"""
 
-    x = ["Algoritmo Genético", "Recozimento Simulado", "Colônia de Formigas"]
+    """x = ["Algoritmo Genético", "Recozimento Simulado", "Colônia de Formigas"]
 
     res = []
     t = 1
@@ -233,4 +240,22 @@ if __name__ == "__main__":
     plt.title(f"Distância encontrada em {t} segundo")
     plt.ylabel("Distância")
     plt.bar(x, res)
-    plt.show()
+    plt.show()"""
+
+    #for a in listdir("mapas"):
+    #    if tamanho_grafo(a) > 500:
+    #        continue
+    a = "a280.csv"
+    cordenadas = abrir_arquivo(f"mapas/{a}")
+    grafo = gerar_grafo(f"mapas/{a}")
+    for i, x in enumerate(cordenadas):
+        for j, y in enumerate(cordenadas):
+            if i == j:
+                continue
+            if x == y:
+                print(i, j, x)
+        
+    print(a)
+    colonia(grafo)
+    genetico(grafo)
+    otimizar_rota(localizacoes=cordenadas, temp_minima=1)

@@ -4,7 +4,7 @@ from typing import List, Tuple
 Grafo = List[List[float]]
 
 
-def abrir_arquivo(nome_arquivo : str = "berlin52.csv") -> List[Tuple[float, float]]:
+def abrir_arquivo(nome_arquivo : str = "mapas/berlin52.csv") -> List[Tuple[float, float]]:
     """Abre um arquivo csv e retorna uma lista de cordenadas [(x1,y1), ..., (xn,yn)]"""
     with open(nome_arquivo) as f:
         b52 = reader(f)
@@ -13,16 +13,17 @@ def abrir_arquivo(nome_arquivo : str = "berlin52.csv") -> List[Tuple[float, floa
             cordenadas.append((float(linha[0]), float(linha[1])))
     return cordenadas
 
-def plotar_caminho(caminho, dist, coordenadas = abrir_arquivo(), plotar = True, salvar = False, nome_fig = "fig", titulo = "titulo"):
+def plotar_caminho(caminho, coordenadas = abrir_arquivo(), dist = False, plotar = True, salvar = False, nome_fig = "fig", titulo = "titulo"):
     for x,y in coordenadas:
         plt.scatter(x,y, c="black", s=16)
     for i in range(len(caminho)):
         plt.plot([coordenadas[caminho[i]][0], coordenadas[caminho[i-1]][0]], [coordenadas[caminho[i]][1], coordenadas[caminho[i-1]][1]], c = "black", label='_no_legend')
     label=f"{dist:.2f}"
-    plt.plot([0,0],[0,0],label=f"Distância : {label}",alpha=0)
-    plt.legend()
     plt.title(titulo)
     
+    if dist:
+        plt.plot([0,0],[0,0],label=f"Distância : {label}",alpha=0)
+        plt.legend()
     if plotar:
         plt.show()
     if salvar:
@@ -53,7 +54,7 @@ def melhor_distancia(grafo : Grafo, caminhos : List[List[int]]) -> Tuple[float, 
             m_caminho = caminho
     return m_distancia, m_caminho
 
-def gerar_grafo(nome_arquivo : str = "berlin52.csv") -> Grafo:
+def gerar_grafo(nome_arquivo : str = "mapas/berlin52.csv") -> Grafo:
     """
     Transforma o arquivo em grafo de distâncias (List[List[float]])
     

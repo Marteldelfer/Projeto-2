@@ -8,7 +8,7 @@ def encontrar_menor_caminho(grafo : Grafo, caminhos : List[List[int]]) -> List[i
     menor_distancia = float("inf")
     menor_caminho = None
     for caminho in caminhos:
-        distancia = distancia_caminho(caminho)
+        distancia = distancia_caminho(grafo, caminho)
         if distancia < menor_distancia:
             menor_distancia = distancia
             menor_caminho = caminho
@@ -88,7 +88,7 @@ def gerar_filhos(pais : List[List[int]], p_mutacao : float = 0.1, p_cruzamento :
     return filhos
 
 def genetico(
-        grafo : Grafo = gerar_grafo("berlin52.csv"),
+        grafo : Grafo = gerar_grafo("mapas/berlin52.csv"),
         n_populacao : int = 60,
         n_geracoes : int = 2000,
         p_mutacao : float = 0.05,
@@ -113,7 +113,7 @@ def genetico(
         pais = selecionar_pais(grafo, filhos)
         t.set_description(str(distancia_caminho(grafo, pais[0])))
     
-    menor_caminho = encontrar_menor_caminho(pais, key=lambda x: distancia_caminho(grafo, x))
+    menor_caminho = encontrar_menor_caminho(grafo, pais)
     return distancia_caminho(grafo, menor_caminho), menor_caminho
 
 if __name__ == "__main__":

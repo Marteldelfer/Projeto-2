@@ -61,9 +61,9 @@ def otimizar_rota(localizacoes: List[Tuple[float, float]] = abrir_arquivo(),
         temperatura *= resfriamento
         t.set_description(f"Temperatura : {(temperatura - temp_minima):.5f} | Distânciaa : {melhor_distancia:.5f}")
     t.close()
-    return melhor_caminho, melhor_distancia
+    return melhor_distancia, melhor_caminho
 
 if __name__ == "__main__":
-    localizacoes = abrir_arquivo("berlin52.csv")
+    localizacoes = abrir_arquivo("mapas/berlin52.csv")
     melhor_caminho, melhor_distancia = otimizar_rota(localizacoes)
     plotar_caminho(melhor_caminho, localizacoes)
