@@ -31,17 +31,17 @@ def proximo_ponto(
     return pontos[-1] # para caso ocorra um erro por aproximação decimal e a escolha seja alta demais.
 
 
-def encontrar_proximidades(mapa : Grafo, CONSTANTE: float) -> Grafo:
+def encontrar_proximidades(mapa : Grafo) -> Grafo:
     """
     Transforma um grafo de distancis em um grafo de proximidade
 
-    A proximidade de dois pontos é dado por `CONSTANTE / distancia`
+    A proximidade de dois pontos é dado por `1 / distancia`
     """
 
     proximidades = [[0] * i for i in range(len(mapa))]
     for a in range(len(proximidades)):
         for b in range(len(proximidades[a])):
-            proximidades[a][b] = CONSTANTE / mapa[a][b]
+            proximidades[a][b] = 1 / mapa[a][b]
     return proximidades
 
 
@@ -97,7 +97,6 @@ def gerar_formigas(
 def colonia(
         mapa = gerar_grafo(),
         C_FEROMONIOS : float = 10.27,
-        C_PROXIMIDADE : float = 488.19,
         alfa : float = 1.42, # importância dos feromônios
         beta : float = 1.65, # importância das proximidades
         taxa_evaporacao : float = 0.70,
@@ -111,7 +110,7 @@ def colonia(
     Itera `n_geracoes` vezes, atualizando feromônios a cada geração
     """
 
-    proximidades = encontrar_proximidades(mapa, C_PROXIMIDADE)
+    proximidades = encontrar_proximidades(mapa)
     feromonios = [[feromonios_iniciais] * i for i in range(len(mapa))]
     melhor_rota, melhor_distancia = [], float('inf')
 
@@ -130,7 +129,7 @@ def colonia(
 
 
 if __name__ == "__main__":
-    s = 0.372921903692934 # melhor resultado encontrado
+    s = 0.11787129513243644 # melhor resultado encontrado
     seed(s)
     distancia, melhor = colonia()
     plotar_caminho(melhor, abrir_arquivo(),titulo=distancia)
