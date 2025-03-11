@@ -102,7 +102,7 @@ def colonia(
         beta : float = 1.65, # importância das proximidades
         taxa_evaporacao : float = 0.70,
         feromonios_iniciais :float = 0.19,
-        n_geracoes : int = 30
+        n_geracoes : int = 50
 ) -> Tuple[float, List[int]]:
     """
     O algoritmo propriamente dito. Retorna a menor distancia, o menor caminho e um 

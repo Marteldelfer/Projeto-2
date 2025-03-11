@@ -59,3 +59,6 @@ def main():
     
 if __name__ == "__main__":
     main()
+    print()
+    for a in os.listdir("mapas"):
+        print(tamanho_grafo(f"mapas/{a}"))

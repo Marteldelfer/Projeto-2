@@ -241,7 +241,7 @@ if __name__ == "__main__":
     plt.ylabel("Distância")
     plt.bar(x, res)
     plt.show()"""
-
+    """
     #for a in listdir("mapas"):
     #    if tamanho_grafo(a) > 500:
     #        continue
@@ -258,4 +258,7 @@ if __name__ == "__main__":
     print(a)
     colonia(grafo)
     genetico(grafo)
-    otimizar_rota(localizacoes=cordenadas, temp_minima=1)
+    otimizar_rota(localizacoes=cordenadas, temp_minima=1)"""
+    for a in listdir("mapas"):
+        if tamanho_grafo(f"mapas/{a}") < 100:
+            print(a)

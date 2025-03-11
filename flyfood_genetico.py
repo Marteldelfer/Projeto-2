@@ -1,4 +1,4 @@
-import csv, math, random, tqdm, matplotlib.pyplot as plt, numpy as np
+import csv, math, random, tqdm, matplotlib.pyplot as plt, numpy as np, time
 from auxiliar import plotar_caminho, gerar_grafo, distancia_caminho, abrir_arquivo
 from typing import List, Tuple
 
@@ -88,11 +88,12 @@ def gerar_filhos(pais : List[List[int]], p_mutacao : float = 0.1, p_cruzamento :
     return filhos
 
 def genetico(
-        grafo : Grafo = gerar_grafo("mapas/berlin52.csv"),
+        mapa : Grafo = gerar_grafo("mapas/berlin52.csv"),
         n_populacao : int = 60,
         n_geracoes : int = 2000,
         p_mutacao : float = 0.05,
         p_cruzamento : float = 0.90,
+        tempo : float = float('inf')
 ):
     """
     Código principal, retorna a menor distância e o menor caminho encontrado
@@ -106,15 +107,20 @@ def genetico(
     
     p_cruzamento -> chance de de dois pais gerarem filho
     """
-    pais = [gerar_caminho_aleatorio(grafo) for _ in range(n_populacao)]
+    pais = [gerar_caminho_aleatorio(mapa) for _ in range(n_populacao)]
+    tempo *= 10**9
+    inicio = time.process_time_ns()
 
     for _ in (t:= tqdm.trange(n_geracoes)):
         filhos = gerar_filhos(pais, p_mutacao=p_mutacao, p_cruzamento=p_cruzamento)
-        pais = selecionar_pais(grafo, filhos)
-        t.set_description(str(distancia_caminho(grafo, pais[0])))
+        pais = selecionar_pais(mapa, filhos)
+        t.set_description(str(distancia_caminho(mapa, pais[0])))
+
+        if tempo < time.process_time_ns() - inicio:
+            break
     
-    menor_caminho = encontrar_menor_caminho(grafo, pais)
-    return distancia_caminho(grafo, menor_caminho), menor_caminho
+    menor_caminho = encontrar_menor_caminho(mapa, pais)
+    return distancia_caminho(mapa, menor_caminho), menor_caminho
 
 if __name__ == "__main__":
     d, caminho = genetico()
