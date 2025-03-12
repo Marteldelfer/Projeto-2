@@ -1,4 +1,14 @@
+import tqdm, time
+
 arquivo_entrada = 'mapa.txt'
+
+""" def mapa_aleatorio(pontos : int = 5, x : int = 1000, y : int = 1000):
+    cordenadas = gerar_coordenadas_aleatorias(pontos, x, y)[1]
+    #Transforma de lista para dict
+    res = dict()
+    for c in range(len(cordenadas)):
+        res[str(c) if c != len(cordenadas) - 1 else 'R'] = cordenadas[c]
+    return res """
 
 def abrir_mapa(mapa_arquivo:str): # retorna um dicionário com as coordenadas de cada ponto de interesse no mapa
     # essas coordenadas são contadas começando do 0, da esquerda para a direita no x e de cima para baixo no y
@@ -72,11 +82,17 @@ def forca_bruta(matriz):
 
     return caminho_menor, tamanho_menor # Adicionando à solução, retornamos a distância percorrida
 
+if __name__ == "__main__":
+    #matriz_de_entrada = abrir_mapa(arquivo_entrada)
+    for p in range(4, 14):
+        mapa = mapa_aleatorio(pontos=p)
+        comeco = time.process_time_ns()
+        caminho, tamanho = forca_bruta(mapa)
+        print(f"Pontos : {p:02d}; Tempo em nanosegundos: {time.process_time_ns() - comeco}")
 
 
-matriz_de_entrada = abrir_mapa(arquivo_entrada)
-caminho, tamanho = forca_bruta(matriz_de_entrada)
-for casa in caminho:
-    print(casa, end=' ')
-print()
-print('distância percorrida: %.2fdm (dronômetros)' % tamanho)
+
+    """ for casa in caminho:
+        print(casa, end=' ')
+    print()
+    print('distância percorrida: %.2fdm (dronômetros)' % tamanho) """

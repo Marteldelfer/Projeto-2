@@ -13,11 +13,14 @@ def abrir_arquivo(nome_arquivo : str = "mapas/berlin52.csv") -> List[Tuple[float
             cordenadas.append((float(linha[0]), float(linha[1])))
     return cordenadas
 
-def plotar_caminho(caminho, coordenadas = abrir_arquivo(), dist = False, plotar = True, salvar = False, nome_fig = "fig", titulo = "titulo"):
+def plotar_caminho(caminho, coordenadas = abrir_arquivo(), dist = False, plotar = True, salvar = False, nome_fig = "fig", titulo = "titulo", a = None):
     for x,y in coordenadas:
         plt.scatter(x,y, c="black", s=16)
     for i in range(len(caminho)):
-        plt.plot([coordenadas[caminho[i]][0], coordenadas[caminho[i-1]][0]], [coordenadas[caminho[i]][1], coordenadas[caminho[i-1]][1]], c = "black", label='_no_legend')
+        plt.plot(
+            [coordenadas[caminho[i]][0], coordenadas[caminho[i-1]][0]], 
+            [coordenadas[caminho[i]][1], coordenadas[caminho[i-1]][1]], 
+            c = "black", label='_no_legend', alpha=a[i] if a != None else 1)
     label=f"{dist:.2f}"
     plt.title(titulo)
     

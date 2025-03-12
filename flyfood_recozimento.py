@@ -26,7 +26,7 @@ def otimizar_rota(localizacoes: List[Tuple[float, float]] = abrir_arquivo(),
                   temp_inicial: float = 1000,
                   temp_minima: float = 1e-8,
                   resfriamento: float = 0.995,
-                  iteracoes_por_temp: int = 300) -> Tuple[List[int], float]:
+                  iteracoes_por_temp: int = 300) -> Tuple[float, List[int]]:
 
     pontos_para_visitar = list(range(len(localizacoes)))
     pontos_para_visitar.remove(0)

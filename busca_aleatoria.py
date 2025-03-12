@@ -1,7 +1,6 @@
 from flyfood_colonia import *
 from flyfood_genetico import *
 from typing import Callable, Dict, List, Any
-from testes import tamanho_grafo
 from auxiliar import *
 from abrir_tsplib import e_numero
 import random
@@ -18,7 +17,7 @@ hp_genetico = {
     "n_populacao" : (20, 400, 4),
     "p_mutacao" : (0.01, 0.2, 0),
     "p_cruzamento" : (0.5, 0.99, 0),
-    "tempo" : (19.999, 20, 0)
+    "tempo" : (14.999, 15, 0)
 }
 
 def ler_caminho(a : str) -> List[int]:
@@ -111,7 +110,7 @@ def otimizar(
         algoritmo :  Callable[[Any], Tuple[float, List[int]]],
         parametros : Dict[str, Tuple[Any, Any, Any]], # Tuple[min e max]
         iteracoes : int = 5,
-        parametros_por_iteracao : int = 15,
+        parametros_por_iteracao : int = 10,
         mapas : List[str] = ["berlin52.csv"],
         otimos : List[float] = [7544]
 ) -> Tuple[float, Any]:
@@ -152,7 +151,7 @@ if __name__ == "__main__":
     otimos = [distancia_caminho(gerar_grafo(f"mapas/{a}"), ler_caminho(a)) for a in mapas]
     
     #print(otimizar(colonia, hp_colonia, mapas=mapas, otimos=otimos))
-    print(otimizar(genetico, hp_genetico, mapas=mapas, otimos=otimos))
+    #print(otimizar(genetico, hp_genetico, mapas=mapas, otimos=otimos))
 
     """
     antigo = (sum(avaliar_multiplos_mapas(colonia, {}, mapas, otimos) for _ in range(10)) / 10)
@@ -164,4 +163,7 @@ if __name__ == "__main__":
                                                     'feromonios_iniciais': 0.42754898056821233
                                                     }, mapas, otimos) for _ in range(10)) / 10)
     print(antigo, novo)
+    """
+    """
+    {'n_populacao': 120, 'p_mutacao': 0.08323414960583844, 'p_cruzamento': 0.7249127475660899})
     """
